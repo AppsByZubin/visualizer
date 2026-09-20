@@ -1,0 +1,64 @@
+Here's a map of the ML models quants actually use, grouped by family. In practice, the simpler end of this list (regularized linear models and gradient-boosted trees) does most of the real work, because financial data is noisy and non-stationary.
+
+## 1. Linear and statistical models (the baseline everyone starts with)
+- **Linear / OLS regression**: factor models such as Fama-French and Barra-style risk models.
+- **Ridge, Lasso, Elastic Net**: regularized regression. These are very common because they resist overfitting noisy returns.
+- **Logistic regression**: predicts direction (up or down) rather than magnitude.
+- **ARIMA / SARIMA**: classical time-series forecasting.
+- **GARCH family (GARCH, EGARCH, GJR-GARCH)**: volatility forecasting, which is central for options pricing and risk.
+- **Vector Autoregression (VAR)**: models several related series together.
+- **Kalman filters / state-space models**: dynamic hedge ratios, pairs trading, and trend estimation.
+- **Hidden Markov Models (HMM)**: detect market regimes such as trending vs. ranging or high-vol vs. low-vol.
+
+## 2. Tree-based models (the industry workhorses)
+- **Random Forest**
+- **Gradient Boosting: XGBoost, LightGBM, CatBoost**. These are probably the most-used ML models in quant equity and crypto. They handle tabular features well and win most tabular prediction competitions.
+- **Extra Trees**
+- **Decision trees**: mainly used for interpretability.
+
+## 3. Classical machine learning
+- **Support Vector Machines (SVM / SVR)**
+- **k-Nearest Neighbors (kNN)**: finds similar historical patterns ("analog" forecasting).
+- **Naive Bayes**: sometimes used for sentiment classification.
+- **Gaussian Processes**: forecasts that come with uncertainty estimates.
+
+## 4. Deep learning for sequences
+- **MLP (feed-forward neural networks)**: used for cross-sectional return prediction, as in Gu, Kelly & Xiu's well-known paper.
+- **RNN, LSTM, GRU**: sequence models for price and volume series.
+- **1D CNNs**: extract patterns from price windows. **DeepLOB** (CNN + LSTM) is used on limit-order-book data.
+- **Temporal Convolutional Networks (TCN)**
+- **Transformers**: Temporal Fusion Transformer (TFT), Informer, Autoformer, PatchTST.
+- **N-BEATS / N-HiTS**: pure deep forecasting architectures.
+- **Time-series foundation models**: pretrained forecasters such as TimesFM, Chronos, and Moirai. These are newer, and their results on financial returns are mixed.
+
+## 5. Unsupervised and representation learning
+- **PCA**: statistical factor extraction and noise reduction. Also used for eigen-portfolios.
+- **Autoencoders / Variational Autoencoders**: latent factors and anomaly detection. **Conditional Autoencoders** (Gu, Kelly & Xiu) are used for asset pricing.
+- **Clustering (k-means, hierarchical, DBSCAN)**: groups similar stocks for pairs trading and diversification. It is also the core of **Hierarchical Risk Parity (HRP)**.
+- **Independent Component Analysis (ICA)**
+
+## 6. Reinforcement learning (execution and portfolio decisions)
+- **Q-learning / Deep Q-Networks (DQN)**
+- **Policy gradient methods: PPO, A2C/A3C, DDPG, SAC**
+- Typical uses are optimal trade execution, market making, and dynamic allocation. RL is used more for execution than for alpha prediction.
+
+## 7. NLP and alternative data
+- **Sentiment models: FinBERT, BERT/RoBERTa**, fine-tuned on news, earnings calls, and filings.
+- **Large language models**: extract signals from text, summarize earnings calls, and classify news events.
+- **Topic models (LDA)**: older, but still seen.
+
+## 8. Graph and relational models
+- **Graph Neural Networks (GCN, GAT)**: model relationships between stocks such as supply chains, sector links, and correlation networks.
+
+## 9. Generative and ensemble methods
+- **GANs (e.g., TimeGAN)**: create synthetic market data for stress-testing and augmentation.
+- **Stacking / blending**: combine several models' predictions. This is very common in production.
+- **Bayesian models / Bayesian neural nets**: produce uncertainty-aware forecasts. The **Black-Litterman** model is used for allocation.
+
+## What matters more than the model choice
+- **Labeling**: López de Prado's triple-barrier method and meta-labeling. Meta-labeling uses a second model to decide whether to act on a primary signal.
+- **Validation**: use walk-forward or purged, embargoed cross-validation. Standard k-fold leaks future information into financial time series.
+- **Features**: feature engineering and stationarity, for example fractional differencing, usually beat switching architectures.
+- **Costs**: transaction costs and slippage often erase an apparent edge, especially in options.
+
+If you want to add ML to rule-based strategies, a practical starting point is **meta-labeling with LightGBM**. You keep your existing signal and train a model only to filter which trades to take.

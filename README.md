@@ -79,6 +79,42 @@ python scripts/create_strategy_notebooks.py --overwrite
 python -m unittest discover -s tests -v
 ```
 
+## Option Selling Research
+
+Raw inputs live under `data/raw/option_selling/`:
+
+```text
+data/raw/option_selling/
+├── nifty/     # weekly + futures expiry calendars, daily and hourly Nifty50 candles
+└── stocks/    # nse_stock_expiry.csv (monthly calendar) + one daily candle JSON per symbol
+```
+
+Notebooks under `notebooks/option_selling/`:
+
+| Notebook | Instrument | Candles | Expiry cycle |
+|---|---|---|---|
+| `nifty50/weekly_expiry_move_table.ipynb` | Nifty50 | daily | weekly |
+| `nifty50/weekly_expiry_move_table_skip_first_candle.ipynb` | Nifty50 | daily | weekly, first candle skipped |
+| `nifty50/weekly_expiry_hourly_move_table.ipynb` | Nifty50 | hourly | weekly |
+| `nifty50/weekly_expiry_hourly_move_table_day2_1115_entry.ipynb` | Nifty50 | hourly | weekly, entry at 11:15 on the 2nd session after expiry |
+| `stocks/monthly_expiry_move_table.ipynb` | any F&O stock | daily | monthly |
+
+Each one measures, from the previous expiry's close, the max upside and max downside
+reached before the next expiry and the move actually settled at expiry. The hourly and
+stock notebooks add a touch-vs-settle ladder: how often a strike was traded through
+intra-cycle versus how often it was still breached at expiry. The daily Nifty50 notebooks
+and the stock notebook also include a survivability (Abraham Wald-style) outlier view: a
+slider sets the percentile band of settled moves, and cycles that settled outside it are
+plotted and listed.
+
+Every expiry date is snapped back to the last session that actually traded on or before
+it, so a holiday-shifted expiry still anchors on a real closing print.
+
+The stock notebook is parameter driven — set `SYMBOL` (plus `SKIP_FIRST_CANDLES`,
+`STRIKE_DISTANCES`, `SCREEN_DISTANCE`) in the parameters cell, or use the dropdown at the
+bottom to switch symbols without editing code. Its final section screens every symbol in
+the folder and ranks them by how often the cycle settled inside a chosen band.
+
 ## Process Raw JSON Files
 
 Run this after adding or replacing candle JSON files in `data/raw/`:
