@@ -97,6 +97,8 @@ Notebooks under `notebooks/option_selling/`:
 | `nifty50/weekly_expiry_move_table_skip_first_candle.ipynb` | Nifty50 | daily | weekly, first candle skipped |
 | `nifty50/weekly_expiry_hourly_move_table.ipynb` | Nifty50 | hourly | weekly |
 | `nifty50/weekly_expiry_hourly_move_table_day2_1115_entry.ipynb` | Nifty50 | hourly | weekly, entry at 11:15 on the 2nd session after expiry |
+| `nifty50/expiry_two_session_move_by_vix.ipynb` | Nifty50 | hourly | weekly, expiry_day−1 open to expiry_day close, bucketed by India VIX |
+| `sensex/expiry_two_session_move_by_vix.ipynb` | Sensex | hourly | weekly, expiry_day−1 open to expiry_day close, bucketed by India VIX |
 | `stocks/monthly_expiry_move_table.ipynb` | any F&O stock | daily | monthly |
 | `stocks/last_two_weeks_expiry_move_table.ipynb` | any F&O stock | daily | final 14 calendar days before monthly expiry |
 | `weekly_monday_friday_move.ipynb` | Nifty50 + Sensex | hourly | calendar Monday–Friday |
@@ -111,6 +113,17 @@ plotted and listed.
 
 Every expiry date is snapped back to the last session that actually traded on or before
 it, so a holiday-shifted expiry still anchors on a real closing print.
+
+The `expiry_two_session_move_by_vix.ipynb` pair (Nifty50 and Sensex, identical code paths,
+only the parameters cell differs) reduces each expiry to one number — the move from the open
+of the session before expiry to the close of expiry — and buckets those moves by the India VIX
+level quoted at entry, giving an average absolute move per VIX band alongside the VIX-implied
+expectation for the same two sessions (`VIX / √252 × √2 × √(2/π)`). It also reports dispersion
+per band, touch-vs-settle rates from the hourly candles inside the window, and the split of the
+move across the entry session, the overnight gap and expiry day. Sessions are counted, not
+calendar days, so `expiry_day−1` is always the session that actually traded. Buckets are
+left-open, right-closed, and India VIX is a Nifty-based quote, so in the Sensex notebook it
+stands in as a volatility-regime proxy rather than that index's own implied vol.
 
 The Monday–Friday notebook measures Monday's first hourly open to Friday's last
 hourly close, in points and percent, with weekly high/low excursions, summary
