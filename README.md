@@ -98,8 +98,10 @@ Notebooks under `notebooks/option_selling/`:
 | `nifty50/weekly_expiry_hourly_move_table.ipynb` | Nifty50 | hourly | weekly |
 | `nifty50/weekly_expiry_hourly_move_table_day2_1115_entry.ipynb` | Nifty50 | hourly | weekly, entry at 11:15 on the 2nd session after expiry |
 | `stocks/monthly_expiry_move_table.ipynb` | any F&O stock | daily | monthly |
+| `stocks/last_two_weeks_expiry_move_table.ipynb` | any F&O stock | daily | final 14 calendar days before monthly expiry |
+| `weekly_monday_friday_move.ipynb` | Nifty50 + Sensex | hourly | calendar Monday–Friday |
 
-Each one measures, from the previous expiry's close, the max upside and max downside
+The expiry notebooks measure, from the previous expiry's close, the max upside and max downside
 reached before the next expiry and the move actually settled at expiry. The hourly and
 stock notebooks add a touch-vs-settle ladder: how often a strike was traded through
 intra-cycle versus how often it was still breached at expiry. The daily Nifty50 notebooks
@@ -110,10 +112,28 @@ plotted and listed.
 Every expiry date is snapped back to the last session that actually traded on or before
 it, so a holiday-shifted expiry still anchors on a real closing print.
 
-The stock notebook is parameter driven — set `SYMBOL` (plus `SKIP_FIRST_CANDLES`,
-`STRIKE_DISTANCES`, `SCREEN_DISTANCE`) in the parameters cell, or use the dropdown at the
-bottom to switch symbols without editing code. Its final section screens every symbol in
-the folder and ranks them by how often the cycle settled inside a chosen band.
+The Monday–Friday notebook measures Monday's first hourly open to Friday's last
+hourly close, in points and percent, with weekly high/low excursions, summary
+statistics and comparison charts for both indices. Missing endpoint candles and
+incomplete observed sessions are excluded and listed in an audit; missing middle
+weekdays are flagged, with an optional five-session requirement. It exports full
+weekly tables to `data/processed/option_selling/weekly_monday_friday/`.
+
+The stock notebook recalculates all daily stock files on Run All and exports combined
+and per-stock monthly move CSVs to `data/processed/option_selling/stocks/`. Intraday
+files are excluded. Use the **Stock Monthly Moves** dropdowns to select a stock,
+expiry year and month. Only completed expiry cycles are shown. Set `SYMBOL` (plus
+`SKIP_FIRST_CANDLES`, `STRIKE_DISTANCES`, `SCREEN_DISTANCE`) in the parameters cell
+for the remaining analysis sections, or use the dropdown at the bottom for additional
+per-stock views. The cross-symbol screen ranks stocks by how often the cycle settled
+inside a chosen band.
+
+The last-two-weeks stock notebook measures the final 14 calendar days before each
+monthly expiry, using the close on or immediately before expiry minus 14 days as
+the base. It keeps the same stock/year/month filters and analysis views, and exports
+`last_two_weeks_expiry_moves.csv` and `<symbol>_last_two_weeks_expiry_moves.csv`
+files in the same processed folder. Filters refer to the ending expiry; windows
+without a base close or a completed expiry are excluded.
 
 ## Process Raw JSON Files
 
